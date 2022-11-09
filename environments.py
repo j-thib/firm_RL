@@ -1,11 +1,8 @@
 import random
 import statistics
 
-prices = []
-quantities = []
-
 class Firm:
-    def __init__(self, tax, price_threshold, demand, cost, q_other):
+    def __init__(self, tax, price_threshold, demand, cost, q_other, price, quantity):
         self.tax = tax
         self.price_threshold = price_threshold
         self.demand = demand
@@ -28,7 +25,6 @@ class Firm:
         return reward
 
     def get_observations(self):
-
         return # should return normalized values representing environment.
 
 class SocialPlanner:
@@ -49,12 +45,12 @@ class SocialPlanner:
         return reward, tax_action, price_threshold_action
 
     def get_observations(self):
-        return # should return normalized observations
+        demand = self.demand / 10000
+        #profit =
+        return demand, profit # should return normalized observations
 
 
 class Environment:
     def __init__(self, n_firms):
-        return
-
-    def set_world(*kwargs):
-        return # should initialize environment
+        self.social = SocialPlanner([0.21,0.21],[0.1,0.1],1000,0.3,0.3)
+        self.firms = [Firm(0.21, 0.1, 1000, 2, 500, 3, 500), Firm(0.21, 0.1, 1000, 2, 500, 3, 500)]
