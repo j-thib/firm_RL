@@ -1,20 +1,27 @@
+import random
+from statistics import mean, stdev
 from environments import Environment, SocialPlanner, Firm
 from ddpg_nets import Agent
 import numpy as np
-from utils import plotRewards
+from utils import plotRewards, cumulative
 
-steps = 12
-episodes = 10
+steps = 10
+episodes = 5000
 env = Environment(n_firms=2)
-agents = [Agent(alpha=0.000025,beta=0.00025, input_dims=[6], tau=0.001, env=env,
-                batch_size=1,  layer1_size=400, layer2_size=300, n_actions=2,
-                gamma=0.99, max_size=10) for i in range(env.n_firms)]
+agents = [Agent(alpha=0.0005,beta=0.00025, input_dims=[6], tau=0.0001, env=env,
+                batch_size=16,  layer1_size=400, layer2_size=300, n_actions=2,
+                gamma=0.95) for i in range(env.n_firms)]
+
+
+
 #social_planner = SocialPlanner()
 firm1 = env.firms[0]
 firm2 = env.firms[1]
 
 #agent.load_models()
-np.random.seed(0)
+np.random.seed(42)
+random.seed(42)
+
 
 score_history = [list(),list()]
 
@@ -32,7 +39,7 @@ for i in range(episodes):
             agents[j].learn()
             score += reward
             obs = new_state
-            print(obs[5])
+            #print(obs)
             #env.render()
             score_history[j].append(score)
         step += 1
@@ -40,7 +47,9 @@ for i in range(episodes):
     #    agent.save_models()
 
     print('episode ', i, 'score %.2f' % score,
-          'trailing 100 games avg %.3f' % np.mean(score_history[-100:]))
+          'trailing 10 games avg %.3f' % np.mean(score_history[-10:]))
 
-filename = 'firm_competition-alpha000025-beta00025-400-300.png'
+filename = 'reward.png'
+filename1 = 'cumulative-reward.png'
 plotRewards(score_history, filename)
+cumulative(score_history, filename1)

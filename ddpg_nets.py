@@ -6,7 +6,7 @@ import torch.optim as optim
 import numpy as np
 
 class OUActionNoise(object):
-    def __init__(self, mu, sigma=0.15, theta=.2, dt=1e-2, x0=None):
+    def __init__(self, mu, sigma=0.1, theta=.2, dt=1e-2, x0=None):
         self.theta = theta
         self.mu = mu
         self.sigma = sigma
@@ -26,6 +26,48 @@ class OUActionNoise(object):
     def __repr__(self):
         return 'OrnsteinUhlenbeckActionNoise(mu={}, sigma={})'.format(
                                                             self.mu, self.sigma)
+
+class ActionNoise(object):
+    def reset(self):
+        pass
+
+class NormalActionNoise(ActionNoise):
+    def __init__(self, mu, sigma=10):
+        self.mu = mu
+        self.sigma = sigma
+
+    def __call__(self):
+        return np.random.normal(self.mu, self.sigma)
+
+    def __repr__(self):
+        return 'NormalActionNoise(mu={}, sigma={})'.format(self.mu, self.sigma)
+
+class AdaptiveParamNoiseSpec(object):
+    def __init__(self, initial_stddev=0.1, desired_action_stddev=0.1, adoption_coefficient=1.01):
+        self.initial_stddev = initial_stddev
+        self.desired_action_stddev = desired_action_stddev
+        self.adoption_coefficient = adoption_coefficient
+
+        self.current_stddev = initial_stddev
+
+    def adapt(self, distance):
+        if distance > self.desired_action_stddev:
+            # Decrease stddev.
+            self.current_stddev /= self.adoption_coefficient
+        else:
+            # Increase stddev.
+            self.current_stddev *= self.adoption_coefficient
+
+    def get_stats(self):
+        stats = {
+            'param_noise_stddev': self.current_stddev,
+        }
+        return stats
+
+    def __repr__(self):
+        fmt = 'AdaptiveParamNoiseSpec(initial_stddev={}, desired_action_stddev={}, adoption_coefficient={})'
+        return fmt.format(self.initial_stddev, self.desired_action_stddev, self.adoption_coefficient)
+
 
 class ReplayBuffer(object):
     def __init__(self, max_size, input_shape, n_actions):
@@ -179,7 +221,7 @@ class ActorNetwork(nn.Module):
 
 class Agent(object):
     def __init__(self, alpha, beta, input_dims, tau, env, gamma=0.99,
-                 n_actions=2, max_size=1000000, layer1_size=400,
+                 n_actions=2, max_size=10, layer1_size=400,
                  layer2_size=300, batch_size=64):
         self.gamma = gamma
         self.tau = tau
@@ -200,6 +242,8 @@ class Agent(object):
                                            layer2_size, n_actions=n_actions,
                                            name='TargetCritic')
 
+        #self.noise = AdaptiveParamNoiseSpec()
+        #self.noise = NormalActionNoise(mu=np.zeros(n_actions))
         self.noise = OUActionNoise(mu=np.zeros(n_actions))
 
         self.update_network_parameters(tau=self.tau)
@@ -224,6 +268,8 @@ class Agent(object):
                                       self.memory.sample_buffer(self.batch_size)
 
         reward = T.tensor(reward, dtype=T.float).to(self.critic.device)
+        reward = ((reward - reward.mean()) / (reward.std() + 1e-10)).to(self.critic.device)
+        #print(reward)
         done = T.tensor(done).to(self.critic.device)
         new_state = T.tensor(new_state, dtype=T.float).to(self.critic.device)
         action = T.tensor(action, dtype=T.float).to(self.critic.device)

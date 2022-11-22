@@ -20,3 +20,12 @@ def plotRewards(score_history, filename):
     plt.plot(range(len(score_history[1])), score_history[1], color='red', label='Firm 1')
     plt.legend()
     plt.savefig(filename)
+    plt.clf()
+
+def cumulative(score_history, filename1):
+    plt.ylabel('Cumulative Reward')
+    plt.xlabel('Steps')
+    plt.plot(range(len(score_history[0])), np.cumsum(score_history[0]), color='blue', label='Firm 0')
+    plt.plot(range(len(score_history[0])), np.cumsum(score_history[1]), color='red', label='Firm 1')
+    plt.legend()
+    plt.savefig(filename1)
