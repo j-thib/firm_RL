@@ -44,7 +44,7 @@ class Firm:
         price = (1000 - self.demand)
         #price = self.price / 10
         cost = self.cost / 10
-        q_other = self.q_other / 10000
+        q_other = self.q_other / 1000
 
         return demand, tax, sigma, price, cost, q_other
 
@@ -81,5 +81,5 @@ class SocialPlanner:
 class Environment:
     def __init__(self, n_firms):
         #self.social = SocialPlanner([0.21,0.21],[0.1,0.1],1000,0.3,0.3)
-        self.firms = [Firm(0.21, 0.1, 1000, 2, 500, 3, 500), Firm(0.21, 0.1, 1000, 2, 500, 3, 500)]
+        self.firms = [Firm(0.21, 0.1, 1000, 2, 0, 3, 500), Firm(0.21, 0.1, 1000, 2, 0, 3, 0)]
         self.n_firms = n_firms

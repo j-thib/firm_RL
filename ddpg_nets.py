@@ -6,7 +6,7 @@ import torch.optim as optim
 import numpy as np
 
 class OUActionNoise(object):
-    def __init__(self, mu, sigma=0.1, theta=.2, dt=1e-2, x0=None):
+    def __init__(self, mu, sigma=0.1, theta=2, dt=1e-7, x0=None):
         self.theta = theta
         self.mu = mu
         self.sigma = sigma
@@ -18,7 +18,7 @@ class OUActionNoise(object):
         x = self.x_prev + self.theta * (self.mu - self.x_prev) * self.dt + \
             self.sigma * np.sqrt(self.dt) * np.random.normal(size=self.mu.shape)
         self.x_prev = x
-        return x
+        return x/5
 
     def reset(self):
         self.x_prev = self.x0 if self.x0 is not None else np.zeros_like(self.mu)
@@ -32,7 +32,7 @@ class ActionNoise(object):
         pass
 
 class NormalActionNoise(ActionNoise):
-    def __init__(self, mu, sigma=10):
+    def __init__(self, mu, sigma=2):
         self.mu = mu
         self.sigma = sigma
 
@@ -243,8 +243,8 @@ class Agent(object):
                                            name='TargetCritic')
 
         #self.noise = AdaptiveParamNoiseSpec()
-        #self.noise = NormalActionNoise(mu=np.zeros(n_actions))
-        self.noise = OUActionNoise(mu=np.zeros(n_actions))
+        self.noise = NormalActionNoise(mu=np.zeros(n_actions))
+        #self.noise = OUActionNoise(mu=np.zeros(n_actions))
 
         self.update_network_parameters(tau=self.tau)
 
