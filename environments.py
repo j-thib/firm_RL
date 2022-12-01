@@ -3,6 +3,12 @@ from random import gauss
 import statistics
 import numpy as np
 
+theta = 1.1 # Elasticity of substitution
+K = 1 # Constant
+M = 10000 # Money available in total market
+
+# Firms compete and produce imperfect substitutes. Increasing their price may lead to
+
 class Firm:
     def __init__(self, tax, sigma, demand, cost, q_other, price, quantity):
         self.tax = tax
@@ -18,7 +24,11 @@ class Firm:
         reward = 1 - 2**(-reward/1e7)
         return reward
 
-    def step(self, actions, q_other, sigma=0.1):
+    def firm_demand(self, agg_demand, agg_price, K=10, theta=theta):
+        self.demand = K * agg_demand * (self.price / agg_price) ** (-theta)
+        return self.demand
+
+    def step(self, actions, q_other, sigma=0.1): # update to take in the
 
         #price_action = actions
         price_action, quantity_action = actions
@@ -36,13 +46,16 @@ class Firm:
 
         return self.get_observations(), reward, False
 
+
     def get_observations(self):
-        #demand = (1000 - self.price) / 10000
-        demand = self.demand / 10000
+
+        #demand = self.demand / 10000 # Change
+
         tax = self.tax
         sigma = self.sigma
-        price = (1000 - self.demand)
-        #price = self.price / 10
+        price = self.price / 100
+        demand = Environment.aggregate_demand(self,
+                                              Environment.aggregate_price(self, n_firms=2, price=price, theta=theta))
         cost = self.cost / 10
         q_other = self.q_other / 1000
 
@@ -79,7 +92,20 @@ class SocialPlanner:
 
 
 class Environment:
-    def __init__(self, n_firms):
+    def __init__(self, n_firms, price):
         #self.social = SocialPlanner([0.21,0.21],[0.1,0.1],1000,0.3,0.3)
-        self.firms = [Firm(0.21, 0.1, 1000, 2, 0, 3, 500), Firm(0.21, 0.1, 1000, 2, 0, 3, 0)]
+        self.firms = [Firm(0.21, 0.1, 1000, 50, 0, 50, 500), Firm(0.21, 0.1, 1000, 50, 0, 50, 0)]
         self.n_firms = n_firms
+        self.price = price
+
+        # create a function with for loop that calculate agg_price
+        # " agg_demand
+    def aggregate_price(self, n_firms, price, theta=theta):
+        agg_price = 0
+        for i in range(n_firms):
+            agg_price += (1/n_firms) * (price**(1-theta))**(1/(1-theta))
+            return agg_price
+
+    def aggregate_demand(self, agg_price, K=K, M=M):
+        agg_demand = K * (M/agg_price)
+        return agg_demand

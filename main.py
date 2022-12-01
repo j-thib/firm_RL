@@ -3,11 +3,11 @@ from statistics import mean, stdev
 from environments import Environment, SocialPlanner, Firm
 from ddpg_nets import Agent
 import numpy as np
-from utils import plotRewards, cumulative
+from utils import plotRewards, cumulative, plotPrices
 
-steps = 12
-episodes = 100
-env = Environment(n_firms=2)
+steps = 2
+episodes = 1
+env = Environment(n_firms=2, price=50)
 agents = [Agent(alpha=0.0005,beta=0.00025, input_dims=[6], tau=0.0001, env=env,
                 batch_size=16,  layer1_size=400, layer2_size=300, n_actions=2,
                 gamma=0.99) for i in range(env.n_firms)]
@@ -18,11 +18,12 @@ firm1 = env.firms[0]
 firm2 = env.firms[1]
 
 #agent.load_models()
-np.random.seed(42)
-random.seed(42)
+np.random.seed(1)
+random.seed(1)
 
 
-score_history = [list(),list()]
+score_history = [list(), list()]
+price_history = [list(), list()]
 
 for i in range(episodes):
     done = False
@@ -37,19 +38,21 @@ for i in range(episodes):
             new_state, reward, done = env.firms[j].step(act,env.firms[1-j].quantity)
             agents[j].remember(obs[j], act, reward, new_state, int(done))
             agents[j].learn()
+            #print(reward)
             score[j] += reward
             obs[j] = new_state
-            print(obs)
+            #print(i,obs)
             #env.render()
             score_history[j].append(score[j])
+            price_history[j].append(obs[j])
+            print(price_history)
         step += 1
-    #if i % 25 == 0:
-    #    agent.save_models()
-
-    #print('episode ', i, 'score %.2f' % score[0],
-          #'trailing 10 games avg %.3f' % np.mean(score_history[-10:]))
+        env.agg_price = env.aggregate_price(n_firms=2, price=env.price, theta=1.1)
+        env.agg_demand = env.aggregate_demand(agg_price=env.agg_price)
 
 filename = 'reward.png'
 filename1 = 'cumulative-reward.png'
+filename2 = 'prices.png'
 plotRewards(score_history, filename)
 cumulative(score_history, filename1)
+plotPrices(price_history, filename2)

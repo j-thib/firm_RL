@@ -29,3 +29,14 @@ def cumulative(score_history, filename1):
     plt.plot(range(len(score_history[1])), np.cumsum(score_history[1]), color='red', label='Firm 1')
     plt.legend()
     plt.savefig(filename1)
+
+def plotPrices(price_history, filename2):
+    plt.ylabel('Prices')
+    plt.xlabel('Steps')
+    plt.plot(range(len(price_history[0])), price_history[0], color='blue', label='Firm 0')
+    plt.plot(range(len(price_history[1])), price_history[1], color='red', label='Firm 0')
+    plt.legend()
+    plt.savefig(filename2)
+
+def plotOutput():
+    return
