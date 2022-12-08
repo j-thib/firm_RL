@@ -1,11 +1,11 @@
 import random
 import gym
 
-import environments_test
+import environments
 from dqn import Agent
-from utils_test import plot_learning_curve
+from utils import plot_learning_curve
 import numpy as np
-from environments_test import Environment
+from environments import Environment, firmEnv
 
 
 env = Environment(n_firms=2, eq_price=5, eq_demand=1000)
@@ -15,8 +15,8 @@ for i in range(env.n_firms)]
 score_history = [list(), list()]
 eps_history = list()
 
-np.random.seed(42)
-random.seed(42)
+np.random.seed(1)
+random.seed(1)
 
 episodes = 100
 steps = 4
@@ -35,11 +35,12 @@ for i in range(episodes):
         for j in range(env.n_firms):
             prices = []
             act[j] = agent[j].choose_action(obs[j])
-            prices.append(environments_test.firmEnv.compute_some_stuff(env.firms[j], actions=act)) # write a function to yield prices and call here
+            prices.append(firmEnv.compute_price_from_action(env.firms[j], actions=act))
 
         print(prices)
 
         env.eq_price = env.equilibrium_price(n_firms=2, prices=prices, theta=environments_test.theta)
+        print(env.eq_price)
         env.eq_demand = env.equilibrium_demand(env.eq_price, K=environments_test.K, M=environments_test.M)
 
         for j in range(env.n_firms):
