@@ -122,3 +122,39 @@ def make_env(env_name, shape=(84,84,1), repeat=4, clip_rewards=False,
     env = StackFrames(env, repeat)
 
     return env
+
+def plotRewards(score_history, filename):
+    plt.ylabel('Reward')
+    plt.xlabel('Steps')
+    plt.plot(range(len(score_history[0])), score_history[0], color='blue', label='Firm 0')
+    plt.plot(range(len(score_history[1])), score_history[1], color='red', label='Firm 1')
+    plt.legend()
+    plt.savefig(filename)
+    plt.clf()
+
+def cumulative(score_history, filename1):
+    plt.ylabel('Cumulative Reward')
+    plt.xlabel('Steps')
+    plt.plot(range(len(score_history[0])), np.cumsum(score_history[0]), color='blue', label='Firm 0')
+    plt.plot(range(len(score_history[1])), np.cumsum(score_history[1]), color='red', label='Firm 1')
+    plt.legend()
+    plt.savefig(filename1)
+    plt.clf()
+
+def plotPrices(price_history, filename2):
+    plt.ylabel('Prices')
+    plt.xlabel('Steps')
+    plt.plot(range(len(price_history[0])), price_history[0], color='blue', label='Firm 0')
+    plt.plot(range(len(price_history[1])), price_history[1], color='red', label='Firm 1')
+    plt.legend()
+    plt.savefig(filename2)
+    plt.clf()
+
+def plotQuantities(quantity_history, filename3):
+    plt.ylabel('Quantities')
+    plt.xlabel('Steps')
+    plt.plot(range(len(quantity_history[0])), quantity_history[0], color='blue', label='Firm 0')
+    plt.plot(range(len(quantity_history[1])), quantity_history[1], color='red', label='Firm 1')
+    plt.legend()
+    plt.savefig(filename3)
+    plt.clf()
