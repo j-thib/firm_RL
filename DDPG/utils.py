@@ -47,3 +47,11 @@ def plotQuantities(quantity_history, filename3):
     plt.plot(range(len(quantity_history[1])), quantity_history[1], color='red', label='Firm 1')
     plt.legend()
     plt.savefig(filename3)
+    plt.clf()
+
+def plotSPReward(sp_score_history, filename4):
+    plt.ylabel('SP reward')
+    plt.xlabel('Steps')
+    plt.plot(range(len(sp_score_history)), sp_score_history, color='blue', label='SP rewards')
+    plt.legend()
+    plt.savefig(filename4)

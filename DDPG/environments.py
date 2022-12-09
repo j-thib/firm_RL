@@ -3,7 +3,7 @@ from random import gauss
 import statistics
 import numpy as np
 
-theta = 1.5 # Elasticity of substitution
+theta = 1.1 # Elasticity of substitution
 K = 1 # Constant
 M = 10000 # Money available in total market
 sigma = 0.1
@@ -97,7 +97,7 @@ class socialPlannerEnv:
         tax_action2 = np.clip(tax_action2, 0, 0.4)
         self.tax2 = tax_action2
 
-        reward = 0.5 * np.sqrt(1 -
+        reward = np.sqrt(expected_utility)
 
         return self.get_observations(), reward, False
 
