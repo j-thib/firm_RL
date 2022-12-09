@@ -38,6 +38,12 @@ def plotPrices(price_history, filename2):
     plt.plot(range(len(price_history[1])), price_history[1], color='red', label='Firm 1')
     plt.legend()
     plt.savefig(filename2)
+    plt.clf()
 
-def plotOutput():
-    return
+def plotQuantities(quantity_history, filename3):
+    plt.ylabel('Quantities')
+    plt.xlabel('Steps')
+    plt.plot(range(len(quantity_history[0])), quantity_history[0], color='blue', label='Firm 0')
+    plt.plot(range(len(quantity_history[1])), quantity_history[1], color='red', label='Firm 1')
+    plt.legend()
+    plt.savefig(filename3)
