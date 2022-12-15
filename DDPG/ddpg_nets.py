@@ -32,7 +32,7 @@ class ActionNoise(object):
         pass
 
 class NormalActionNoise(ActionNoise):
-    def __init__(self, mu=1.0, sigma=2):
+    def __init__(self, mu=0.2, sigma=0.2):
         self.mu = mu
         self.sigma = sigma
 

@@ -6,8 +6,8 @@ from ddpg_nets import Agent
 import numpy as np
 from utils import plotRewards, cumulative, plotPrices, plotQuantities, plotSPReward, cumulativeSP
 
-steps = 4
-episodes = 10
+steps = 12
+episodes = 500
 env = Environment(n_firms=2)
 agents = [Agent(alpha=0.00025,beta=0.0005, input_dims=[5], tau=0.01, env=env,
                 batch_size=8,  layer1_size=400, layer2_size=300, n_actions=2,
@@ -28,6 +28,7 @@ expected_utility_history = []
 expected_utility = 0
 
 for i in range(episodes):
+    print(i)
     score = [0, 0]
     score_sp = [0]
     act = [None, None]
@@ -38,8 +39,20 @@ for i in range(episodes):
     done_sp = False
     step = 0
 
+    obs_sp = env.social_planner.reset()
+    act_sp = social_agent.choose_action(obs_sp)
+    new_state_sp = env.social_planner.step(act_sp, expected_utility)[0]
+    #print("tax 1:", new_state_sp[0], " tax 2:", new_state_sp[1])
+
     for j in range(env.n_firms):
         obs[j] = env.firms[j].reset()
+
+        obs[j] = list(obs[j])
+        if j == 0:
+            obs[j][1] = new_state_sp[0]
+        else:
+            obs[j][1] = new_state_sp[1]
+        obs[j] = tuple(obs[j])
 
     while(step<steps):
         prices = list()
@@ -75,15 +88,13 @@ for i in range(episodes):
         expected_utility_history.append((score_history[0][i] + score_history[1][i]) / 2)
     expected_utility = (score_history[0][i] + score_history[1][i]) / 2
 
-    obs_sp = env.social_planner.reset()
-    act_sp = social_agent.choose_action(obs_sp)
-    new_state_sp, reward_sp, done_sp = env.social_planner.step(act_sp, expected_utility)
+    reward_sp = env.social_planner.step(act_sp, expected_utility)[1]
+    done_sp = env.social_planner.step(act_sp, expected_utility)[2]
     score_sp += reward_sp
     sp_score_history.append(score_sp)
     social_agent.remember(obs_sp, act_sp, reward_sp, new_state_sp, int(done))
     social_agent.learn()
     obs_sp = new_state_sp
-
 
 #print(mean(price_history[0]))
 #print(mean(price_history[1]))

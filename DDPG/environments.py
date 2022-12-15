@@ -43,8 +43,8 @@ class firmEnv:
     def step(self, actions, eq_demand, eq_price, K=K, theta=theta, sigma=sigma):
 
         price_action, quantity_action = actions
-        price_action = np.clip(price_action, -0.1, 0.1)
-        self.price = np.clip(abs((price_action * sigma + 1) * self.price), 2, 10)
+        price_action = np.clip(price_action, -1, 1)
+        self.price = np.clip(abs((price_action * sigma + 1) * self.price), 2, 8)
         quantity_action = np.clip(quantity_action, 0, 1)
         self.quantity = quantity_action * self.eq_demand
 
@@ -86,19 +86,20 @@ class socialPlannerEnv:
     def step(self, actions_sp, expected_utility):
         tax_action_a, tax_action_b = actions_sp
 
-        tax_action_a = np.clip(tax_action_a, 0, 0.4)
-        self.company_tax_a = tax_action_a
-        tax_action_b = np.clip(tax_action2, 0, 0.4)
-        self.company_tax_b = tax_action_b
+        tax_action_a = np.clip(tax_action_a, 0, 1)
+        self.tax_a = tax_action_a
+        tax_action_b = np.clip(tax_action_b, 0, 1)
+        self.tax_b = tax_action_b
 
-        reward = np.sqrt(expected_utility)
+        reward = expected_utility
 
         return self.get_observations(), reward, False
 
     def get_observations(self):
-        self.company_tax_a = tax_a
-        self.company_tax_b = tax_b
-        self.expected_utility = expected_utility
+
+        tax_a = self.tax_a
+        tax_b = self.tax_b
+        expected_utility = self.expected_utility
 
         return tax_a, tax_b, expected_utility
 
@@ -108,9 +109,9 @@ class socialPlannerEnv:
 
 class Environment:
     def __init__(self, n_firms):
-        self.firms = [firmEnv(tax=0.21, sigma=0.1, eq_demand=1000, cost=1, price=5, quantity=500, demand=500),
-                      firmEnv(tax=0.21, sigma=0.1, eq_demand=1000, cost=1, price=5, quantity=500, demand=500)]
-        self.social_planner = socialPlannerEnv(tax_a=0.21, tax_b=0.21, expected_utility=0.0)
+        self.firms = [firmEnv(tax=0.21, sigma=0.008, eq_demand=1000, cost=1, price=5, quantity=500, demand=500),
+                      firmEnv(tax=0.21, sigma=0.008, eq_demand=1000, cost=4, price=5, quantity=500, demand=500)]
+        self.social_planner = socialPlannerEnv(tax_a=0.20, tax_b=0.20, expected_utility=0.0)
         self.n_firms = n_firms
 
         # create a function with for loop that calculate agg_price
@@ -122,3 +123,5 @@ class Environment:
 
     def equilibrium_demand(self, eq_price, K=K, M=M):
         self.eq_demand = K * (M/self.eq_price)
+
+    #def assign_tax(self, obs_sp, new_state_sp):
