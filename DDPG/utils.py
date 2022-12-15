@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pylab as pl
+
 
 def plotLearning(scores, filename, x=None, window=5):
     N = len(scores)
@@ -55,3 +57,12 @@ def plotSPReward(sp_score_history, filename4):
     plt.plot(range(len(sp_score_history)), sp_score_history, color='blue', label='SP rewards')
     plt.legend()
     plt.savefig(filename4)
+    plt.clf()
+
+def cumulativeSP(sp_score_history, filename5):
+    plt.ylabel('SP Cumulative Reward')
+    plt.xlabel('Steps')
+    plt.plot(range(len(sp_score_history)), np.cumsum(sp_score_history), color='green', label='SP rewards')
+    plt.legend()
+    plt.savefig(filename5)
+    plt.clf()
