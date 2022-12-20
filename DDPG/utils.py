@@ -24,11 +24,13 @@ def plotRewards(score_history, filename):
     plt.savefig(filename)
     plt.clf()
 
-def cumulative(score_history, filename1):
+def cumulative(score_history, score_history_noSP, filename1):
     plt.ylabel('Cumulative Reward')
     plt.xlabel('Steps')
-    plt.plot(range(len(score_history[0])), np.cumsum(score_history[0]), color='blue', label='Firm 0')
-    plt.plot(range(len(score_history[1])), np.cumsum(score_history[1]), color='red', label='Firm 1')
+    plt.plot(range(len(score_history[0])), np.cumsum(score_history[0]), color='blue', label='Firm A')
+    plt.plot(range(len(score_history[1])), np.cumsum(score_history[1]), color='red', label='Firm B')
+    plt.plot(range(len(score_history_noSP[0])), np.cumsum(score_history_noSP[0]), color='cyan', label='Firm A (no SP)')
+    plt.plot(range(len(score_history_noSP[1])), np.cumsum(score_history_noSP[1]), color='green', label='Firm B (no SP)')
     plt.legend()
     plt.savefig(filename1)
     plt.clf()
@@ -36,8 +38,8 @@ def cumulative(score_history, filename1):
 def plotPrices(price_history, filename2):
     plt.ylabel('Prices')
     plt.xlabel('Steps')
-    plt.plot(range(len(price_history[0])), price_history[0], color='blue', label='Firm 0')
-    plt.plot(range(len(price_history[1])), price_history[1], color='red', label='Firm 1')
+    plt.plot(range(len(price_history[0])), price_history[0], color='blue', label='Firm A')
+    plt.plot(range(len(price_history[1])), price_history[1], color='red', label='Firm B')
     plt.legend()
     plt.savefig(filename2)
     plt.clf()
@@ -45,15 +47,15 @@ def plotPrices(price_history, filename2):
 def plotQuantities(quantity_history, filename3):
     plt.ylabel('Quantities')
     plt.xlabel('Steps')
-    plt.plot(range(len(quantity_history[0])), quantity_history[0], color='blue', label='Firm 0')
-    plt.plot(range(len(quantity_history[1])), quantity_history[1], color='red', label='Firm 1')
+    plt.plot(range(len(quantity_history[0])), quantity_history[0], color='blue', label='Firm A')
+    plt.plot(range(len(quantity_history[1])), quantity_history[1], color='red', label='Firm B')
     plt.legend()
     plt.savefig(filename3)
     plt.clf()
 
 def plotSPReward(sp_score_history, filename4):
     plt.ylabel('SP reward')
-    plt.xlabel('Steps')
+    plt.xlabel('Episodes')
     plt.plot(range(len(sp_score_history)), sp_score_history, color='blue', label='SP rewards')
     plt.legend()
     plt.savefig(filename4)
@@ -61,8 +63,10 @@ def plotSPReward(sp_score_history, filename4):
 
 def cumulativeSP(sp_score_history, filename5):
     plt.ylabel('SP Cumulative Reward')
-    plt.xlabel('Steps')
+    plt.xlabel('Episodes')
     plt.plot(range(len(sp_score_history)), np.cumsum(sp_score_history), color='green', label='SP rewards')
     plt.legend()
     plt.savefig(filename5)
     plt.clf()
+
+#def fairness_plot()
